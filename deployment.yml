@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydjango-deployment
+  labels:
+    app: django
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+      - name: django
+        image: milgurung/django:v1
+        ports:
+        - containerPort: 8080          
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mydjango-service
+spec:
+  type: NodePort  # Change to NodePort so that we can access the app based on NODE IP and Port! By default it is ClusterIP type
+  selector:
+    app: django
+  ports:
+  - name: mydjango-service-port
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+    nodePort: 30100  #Change to NodePort so that we can access the app based on NODE IP and Port! By default it is ClusterIP type, NodePort range between 30000-32767!
+
+    # Make service type to NodePort so it is an EXTERNAL SERVICE! Default=ClusterIP which is internal Service.
+    # Now service is accessible NodeIp:NodePort
+
+
+# Helpful Commands
+
+# >minikube start
+# >minikube stop
+# >minikube dashboard [Takes you to Kubdash]
+# >minikube ip [get ip address of the minikube]
+# >minikube status [very helpful]
+# >minikube service -all [very important one. It takes you the your nginx service!]
+
+# --kubectl Commands
+
+# >kubectl get all
+# >kubectl get svc (list all services)
+# >kubectl apply -f deployment.yml 
+# >kubectl get pods -o wide (details output)
+# >kubectl scale deployment/mydjango-deployment --replicas=1
+# >kubectl rollout history deployment/mydjango-deployment
+
+# #Make NodePort Service and then find the node ip address and use the nodePort to access from the browser
+
+# e.g. NodeIp:NodePort!
+
